@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<!--jQuery dependencies-->
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/themes/base/jquery-ui.css" />
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>    
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+<!--PQ Grid files-->
+    <link rel="stylesheet" href="grid/pqgrid.min.css" />
+    <script src="grid/pqgrid.min.js"></script>
+<!--PQ Grid Office theme-->
+    <link rel="stylesheet" href="grid/themes/office/pqgrid.css" />
+
+<style>
+
+#grid_array { position:absolute; visibility:show; left: 20px; top: 450px; z-index:200; }
+
+body {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.bar {
+  fill: steelblue;
+}
+.bar2 {
+  fill: steelblue;
+}
+
+.x.axis path {
+  display: none;
+}
+
+</style>
+
+
+<script>
+
+//window.onload = barChart;
+function barChart(){
+
+var vertibar= [
+{"key":"12" , "totmut":"9789" , "letter":"A,C,D,R,S,V" , "mutcount":[573,1320,4041,563,636,2656]},
+{"key":"13" , "totmut":"885" , "letter":"D" , "mutcount":[885]}
+];
+
+var i=0;
+var len=vertibar.length;
+var maxcount=vertibar[0].totmut; 
+for(i=1;i<len;i++){
+ if(vertibar[i].totmut>maxcount)
+ {maxcount=vertibar[i].totmut;
+ }
+}
+
+
+var color;
+var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var formatPercent = d3.format("");
+
+var x = d3.scale.ordinal()
+    .rangeRoundBands([0, width], 0);
+
+var y = d3.scale.linear()
+    .range([height-30, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left").ticks(0)
+    .tickFormat(formatPercent);
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+d3.tsv("d3t2data.tsv", function(error, data) {
+
+  data.forEach(function(d) {
+    //d.key = +d.key;
+  });
+var mutlen;
+  x.domain(data.map(function(d) { return d.key; }));
+ // y.domain([0, d3.max(mutcount, function(d) { return d.mcount; })]);
+   function myColor(letter)
+  { 
+     if (letter =="A"){
+		color="rgb(169,232,198)";
+	}
+	else if (letter =="B"){
+		color="rgb(125,125,125)";
+	}
+	 if (letter =="C"){
+        color="rgb(194,199,129)";
+	}
+	 if (letter =="D"){
+        color="rgb(253,204,8)";
+	}
+	 if (letter =="E"){
+        color="rgb(185,105,142)";
+	}
+	 if (letter =="F"){
+        color="rgb(230,132,19)";
+	}
+	 if (letter =="G"){
+        color="rgb(13,98,0)";
+	}
+	 if (letter =="H"){
+        color="rgb(50,187,202)";
+	}
+	 if (letter =="I"){
+        color="rgb(99,230,59)";
+	}
+	 if (letter =="J"){
+        color="rgb(125,125,125)";
+	}
+	 if (letter =="K"){
+        color="rgb(69,95,198)";
+	}
+	 if (letter =="L"){
+        color="rgb(99,230,59)";
+	}
+	 if (letter =="M"){
+        color="rgb(57,203,46)";
+	}
+	 if (letter =="N"){
+        color="rgb(217,97,230)";
+	}
+	 if (letter =="O"){
+        color="rgb(125,125,125)";
+	}
+	 if (letter =="P"){
+        color="rgb(75,210,106)";
+	}
+	 if (letter =="Q"){
+        color="rgb(240,144,218)";
+	}
+	 if (letter =="R"){
+        color="rgb(92,91,50)";
+	}
+	 if (letter =="S"){
+        color="rgb(135,109,168)";
+	}
+	 if (letter =="T"){
+        color="rgb(193,89,213)";
+	}
+	 if (letter =="U"){
+        color="rgb(125,125,125)";
+	}
+	 if (letter =="V"){
+        color="rgb(112,145,109)";
+	}
+	 if (letter =="W"){
+        color="rgb(61,109,146)";
+	}
+	 if (letter =="X"){
+        color="rgb(125,125,125)";
+	}
+	 if (letter =="Y"){
+        color="rgb(157,199,232)";
+	}
+	 if (letter =="Z"){
+        color="rgb(125,125,125)";
+	}
+
+    return color;  
+  } 
+  
+  var yval;
+  function mutplot(key, xstart, xrange)
+  {
+    for(i=0;i<len;i++)
+	{if(key == vertibar[i].key)
+		{
+		height = 500 - margin.top - margin.bottom-30;
+		var letval=vertibar[i].letter.split(",");
+		var mutval=vertibar[i].mutcount;
+	    mutlen=letval.length;
+		yval=0;
+	    for(var j=0;j<mutlen; j++)
+		{
+			var let=letval[j];
+			var mutht=mutval[j];
+			Number(mutht);
+			yval =yval+mutht;
+			svg.selectAll(".bar2")
+             .data(data)
+			 .enter().append("rect")
+             .attr("class", "bar")
+             .attr("x", xstart)
+             .attr("width", xrange)
+	         .style("fill",function(d) {myColor(let); return color; })
+             .attr("y", height-(yval/maxcount)*height)
+             .attr("height",(mutht/maxcount)*height );
+		
+		}
+		}
+		
+    }
+  }
+  
+  
+  
+  
+
+  
+  
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+   svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", -30)
+	  .attr("x", -40)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Mutation Count");
+	  
+	svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("y", 5)
+	  .attr("x", -10)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text(maxcount);  
+	  
+ 	svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("y", 420)
+	  .attr("x", -10)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("0");  
+ 	
+	  
+  svg.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) {return x(d.key);})
+      .attr("width", x.rangeBand())
+	  .style("fill",function(d) {mutplot(d.key,x(d.key),x.rangeBand());  myColor(d.letter); return color; })
+      .attr("y", 420)
+      .attr("height", 15);
+	  
+ 
+});
+
+}
+
+
+
+</script>
+<script>
+    $(function () {
+        var data = [['p.5KE', 'chr12:25398306-25398306',1,1,1,1,'Subs-Missense','SOMATIC # CANCER','No','probably damaing'],
+            ['p.K5N', 'chr12:25398304-25398304',1,1,1,1,'Subs-Missense','SOMATIC # CANCER','No','probably damaing'],
+			['p.A11P', 'chr12:25398288-25398306',1,1,1,0,'Subs-Missense','SOMATIC # CANCER','No','NA']];
+
+
+        var obj = { width: 1100, height: 200, title: "",resizable:true,draggable:true };
+        obj.colModel = [{ title: "AA Mutation", width: 100, dataType: "string" },
+        { title: "Genomic Pos.", width: 150, dataType: "string" },
+        { title: "#Study(s)", width: 100, dataType: "integer", align: "centre" },
+        { title: "#Sample(s)", width: 100, dataType: "integer", align: "centre" },
+	    { title: "#Cancer Type", width: 100, dataType: "integer", align: "centre" },	
+		{ title: "#Valid Study", width: 100, dataType: "integer", align: "centre" },
+		{ title: "Mut. Sub Type", width: 100, dataType: "string" },
+		{ title: "Mut. Category", width: 100, dataType: "string" },
+		{ title: "Func. Valid.", width: 100, dataType: "string" },
+		{ title: "Polyphen", width: 100, dataType: "string" }];
+        obj.dataModel = { data: data };
+        $("#grid_array").pqGrid(obj);
+
+    });
+        
+</script>    
+
+</head>
+
+<body onload="barChart()">
+
+
+
+ <button onclick="body.style.zoom='200%'">Zoom 200%</button>
+ <button onclick="body.style.zoom='100%'">Zoom 100%</button>
+ <button onclick="body.style.zoom='75%'">Zoom 75%</button>
+ <div id="grid_array" style="margin:100px;"></div>
+</body>
+</html>
